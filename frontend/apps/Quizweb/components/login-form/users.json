@@ -1,0 +1,7 @@
+{
+    "users": [
+      { "email": "shubham@tech.com", "password": "roodra", "role": "user" },
+      { "email": "kitty@tech.com", "password": "kitty", "role": "admin" }
+    ]
+  }
+  
