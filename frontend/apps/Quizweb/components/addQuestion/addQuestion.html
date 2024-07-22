@@ -70,20 +70,22 @@
 <body>
   <h1>Add Question</h1>
   <form id="addQuestionForm">
-    <label for="questionId">Question ID:</label>
-    <input type="number" id="questionId" name="questionId" required>
     <label for="questionText">Question Text:</label>
     <input type="text" id="questionText" name="questionText" required>
-    <label for="options">Options (comma separated):</label>
-    <input type="text" id="options" name="options" required>
+    <label for="option1">Option 1:</label>
+    <input type="text" id="option1" name="option1" required>
+    <label for="option2">Option 2:</label>
+    <input type="text" id="option2" name="option2" required>
+    <label for="option3">Option 3:</label>
+    <input type="text" id="option3" name="option3" required>
+    <label for="option4">Option 4:</label>
+    <input type="text" id="option4" name="option4" required>
     <label for="correctAnswer">Correct Answer:</label>
     <input type="text" id="correctAnswer" name="correctAnswer" required>
     <button type="submit">Add Question</button>
   </form>
-  <script type="module" src="../scripts/addQuestion.mjs"></script></body>
+  <script type="module" src="./addQuestion.mjs"></script>
+</body>
 </html>
-
-
-
 
 
