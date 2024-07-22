@@ -1,0 +1,7 @@
+{
+    "users": [
+      { "email": "user@tech.com", "password": "user", "role": "user" },
+      { "email": "admin@tech.com", "password": "admin", "role": "admin" }
+    ]
+  }
+  

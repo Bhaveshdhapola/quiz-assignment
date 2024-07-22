@@ -1,42 +1,32 @@
+document.getElementById('addQuestionForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
 
-function addQuestion(event) {
-    event.preventDefault(); 
-  
-    // Get form data
-    var questionId = document.getElementById('questionId').value;
-    var questionText = document.getElementById('questionText').value;
-    var options = document.getElementById('options').value.split(',').map(option => option.trim());
-    var correctAnswer = document.getElementById('correctAnswer').value;
-  
-    // Create question object
-    var question = {
-      id: questionId,
-      text: questionText,
-      options: options,
-      correctAnswer: correctAnswer
-    };
-  
-    // Store question in localStorage
-    var questions = JSON.parse(localStorage.getItem('questions')) || [];
-    questions.push(question);
-    localStorage.setItem('questions', JSON.stringify(questions));
-  
-    // Clear form fields (optional)
-    document.getElementById('addQuestionForm').reset();
-  
-    // Redirect to viewQuestion.html (optional)
-    window.location.href = './viewQuestions.html';
+  const question = {
+    question_text: document.getElementById('questionText').value,
+    option1: document.getElementById('option1').value,
+    option2: document.getElementById('option2').value,
+    option3: document.getElementById('option3').value,
+    option4: document.getElementById('option4').value,
+    correct_answer: document.getElementById('correctAnswer').value
+  };
+
+  try {
+    const response = await fetch('http://localhost:3000/api/addQuestion', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(question)
+    });
+    const result = await response.json();
+    if (response.ok) {
+      alert(result.message);
+      document.getElementById('addQuestionForm').reset();
+    } else {
+      alert('Failed to add question: ' + result.error);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Failed to add question');
   }
-  
-
-
-
-
-
-
-
-
-
-
-
-
+});
