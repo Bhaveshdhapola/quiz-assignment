@@ -3,6 +3,9 @@ exports.doService = async (req) => {
     LOG.info('Viewing all questions');
     return { data: CONSTANTS.TRUE_RESULT, questions };
 };
+
+
+
 /*const express = require('express');
 const router = express.Router();
 const db = require('../db/db_connection');

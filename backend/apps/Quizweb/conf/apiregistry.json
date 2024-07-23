@@ -1,5 +1,5 @@
 {
-    "/apps/Quizweb/auth": "/apis/login.js" ,
+    "/apps/Quizweb/login": "/apis/login.js" ,
     "/apps/Quizweb/addQuestion": "/apis/addQuestion.js",
     "/apps/Quizweb/viewQuestions": "/apis/viewQuestions.js",
     "/apps/Quizweb/assignQuestion": "/apis/assignQuestion.js",
