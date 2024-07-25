@@ -1,22 +1,32 @@
-<!doctype html>
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <!-- <script type="module">
-        import { login_form } from '/apps/Quizweb/components/login-form/login-form.mjs';
-        login_form.register();
-    </script> -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Styled Link Button</title>
+  <style>
+    .button-link {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    .button-link:hover {
+      background-color: #45a049;
+    }
+
+    .button-link:active {
+      background-color: #397d3f;
+    }
+  </style>
 </head>
-
 <body>
-    <h1>Login Page</h1>
-
-    <a href="components/login-form/login-form.html">Click here</a>
-
-    <login-form></login-form>
-
+  <a href="components/login-form/login-form.html" class="button-link">loginForm</a>
 </body>
-
 </html>

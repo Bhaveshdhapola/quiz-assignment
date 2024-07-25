@@ -1,29 +1,55 @@
-const express = require('express');
-const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 
-// Load user data from users.json
-const usersFilePath = path.resolve(__dirname, '../db/users.json');
-const users = JSON.parse(fs.readFileSync(usersFilePath, 'utf-8')).users;
+const CONSTANTS = {
+  FALSE_RESULT: { success: false, message: "Invalid credentials" }
+};
+const LOG = {
+  error: console.error,
+  info: console.log
+};
 
-// Login API
-router.post('/login', (req, res) => {
-  const { email, password } = req.body;
+exports.doService = async req => {
+  let users;
 
-  const user = users.find(u => u.email === email && u.password === password);
-  if (user) {
-    res.json({
-      message: 'Login successful',
-      user: {
-        email: user.email,
-        role: user.role
-      }
-    });
-  } else {
-    res.status(401).json({ message: 'Invalid email or password' });
+  try {
+    const data = fs.readFileSync(path.join(__dirname, '../db/users.json'), 'utf8');
+    users = JSON.parse(data).users;
+    LOG.info(`Loaded users: ${JSON.stringify(users)}`);
+  } catch (error) {
+    LOG.error("Failed to load users.json", error);
+    return { data: CONSTANTS.FALSE_RESULT };
   }
-});
 
-module.exports = router;
-    
+  const jsonReq = req;
+
+  if (!jsonReq) {
+    LOG.error("Request data is null or undefined");
+    return { data: CONSTANTS.FALSE_RESULT };
+  }
+
+  LOG.info(`Received login request: ${JSON.stringify(jsonReq)}`);
+
+  if (!validateRequest(jsonReq)) {
+    LOG.error(`Bad login request. Received data: ${JSON.stringify(jsonReq)}`);
+    return { data: CONSTANTS.FALSE_RESULT };
+  }
+
+  const { email, password } = jsonReq;
+  const user = users.find(user => user.email === email);
+  LOG.info(`Found user: ${JSON.stringify(user)}`);
+
+  if (user && password === user.password) {
+    LOG.info(`User authenticated: ${JSON.stringify(user)}`);
+    return {
+      data: {
+        user: { email: user.email, role: user.role }
+      }
+    };
+  } else {
+    LOG.error(`Authentication failed for email: ${email}`);
+    return { data: CONSTANTS.FALSE_RESULT };
+  }
+};
+
+const validateRequest = jsonReq => jsonReq && jsonReq.email && jsonReq.password;

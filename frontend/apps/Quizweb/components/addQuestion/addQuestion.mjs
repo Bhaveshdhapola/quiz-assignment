@@ -11,7 +11,7 @@ document.getElementById('addQuestionForm').addEventListener('submit', async (eve
   };
 
   try {
-    const response = await fetch('http://localhost:3000/api/addQuestion', {
+    const response = await fetch('http://localhost:9090/apps/Quizweb/api/addQuestion', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
