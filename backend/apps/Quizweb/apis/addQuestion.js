@@ -1,53 +1,51 @@
 const db = require('../db/db_connection');
+
+const CONSTANTS = {
+  FALSE_RESULT: { success: false, message: "Invalid request" },
+  TRUE_RESULT: { success: true, message: "Question added successfully" }
+};
+
+const LOG = {
+  error: console.error,
+  info: console.log
+};
+
+
 const validateRequest = (jsonReq) => {
-  const isValid = jsonReq && jsonReq.quizId && jsonReq.questionText && Array.isArray(jsonReq.options) && jsonReq.correctAnswer !== undefined;
-  LOG.info(`Validation result for request: ${JSON.stringify(jsonReq)} is ${isValid}`);
-  return isValid;
+  LOG.info(`Validating request: ${JSON.stringify(jsonReq)}`);
+  return jsonReq &&
+         jsonReq.quizId &&
+         jsonReq.questionText &&
+         Array.isArray(jsonReq.options) &&
+         jsonReq.correctAnswer !== undefined;
 };
 
-// Exporting the doService function
-exports.doService = async (req) => {
-  const jsonReq = req.data; // Extract data from the request object
-  LOG.info(`Received request data: ${JSON.stringify(jsonReq)}`);
 
-  if (!validateRequest(jsonReq)) { // Validate the request
-      LOG.error(`Bad add question request ${jsonReq ? JSON.stringify(jsonReq) : "null"}.`);
-      return { data: CONSTANTS.FALSE_RESULT, message: 'Invalid request' };
-  } else {
-      const { quizId, questionText, options, correctAnswer } = jsonReq;
+const doService = async (req) => {
+  LOG.info('Adding a new question');
 
-      const question = {
-          id: questionIdCounter++,
-          quizId,
-          questionText,
-          options,
-          correctAnswer,
-      };
+  const jsonReq = req.body;
 
-      questions.push(question); // Save the question to mock database
-      LOG.info(`Question added: ${JSON.stringify(question)}`);
-      return { data: CONSTANTS.TRUE_RESULT, question };
+  if (!validateRequest(jsonReq)) {
+    LOG.error('Invalid request data');
+    return { data: CONSTANTS.FALSE_RESULT };
   }
-};
-/*const express = require('express');
-const router = express.Router();
-const db = require('../db/db_connection');
 
-router.post('/addQuestion', (req, res) => {
-  const { question_text, option1, option2, option3, option4, correct_answer } = req.body;
+  const { quizId, questionText, options, correctAnswer } = jsonReq;
+  const optionsString = JSON.stringify(options);
 
-  const stmt = db.prepare(`INSERT INTO questions (question_text, option1, option2, option3, option4, correct_answer) VALUES (?, ?, ?, ?, ?, ?)`);
-  
-  stmt.run(question_text, option1, option2, option3, option4, correct_answer, (err) => {
-    if (err) {
-      res.status(500).json({ error: 'Failed to add question' });
-    } else {
-      res.status(200).json({ message: 'Question added successfully' });
-    }
+  return new Promise((resolve) => {
+    const sql = `INSERT INTO questions (quizId, questionText, options, correctAnswer) VALUES (?, ?, ?, ?)`;
+    db.run(sql, [quizId, questionText, optionsString, correctAnswer], function (err) {
+      if (err) {
+        LOG.error(`Failed to add question: ${err.message}`);
+        resolve({ data: CONSTANTS.FALSE_RESULT });
+      } else {
+        LOG.info(`Question added with ID: ${this.lastID}`);
+        resolve({ data: CONSTANTS.TRUE_RESULT, questionId: this.lastID });
+      }
+    });
   });
+};
 
-  stmt.finalize();
-});
-
-module.exports = router;
-*/
+module.exports = { doService };

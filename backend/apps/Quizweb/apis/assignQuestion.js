@@ -1,42 +1,30 @@
 const db = require('../db/db_connection');
-const validateRequest = (jsonReq) => {
-  return jsonReq && jsonReq.quizId && jsonReq.questionId;
+
+const CONSTANTS = {
+  TRUE_RESULT: { success: true, message: "Questions retrieved successfully" },
+  FALSE_RESULT: { success: false, message: "Failed to retrieve questions" }
+};
+
+const LOG = {
+  error: console.error,
+  info: console.log
 };
 
 // Exporting the doService function
 exports.doService = async (req) => {
-  const jsonReq = req.data; // Extract data from the request object
-  LOG.info(`Received assign question request data: ${JSON.stringify(jsonReq)}`);
+  LOG.info('Retrieving all questions');
 
-  if (!validateRequest(jsonReq)) { // Validate the request
-      LOG.error(`Bad assign question request ${jsonReq ? JSON.stringify(jsonReq) : "null"}.`);
-      return { data: 'Done', message: ' request ok' };
-  } else {
-      const { quizId, questionId } = jsonReq;
-
-      // Find the question by questionId
-      const question = questions.find(q => q.id === questionId);
-
-      if (!question) {
-          LOG.error(`Question with id ${questionId} not found.`);
-          return { data: CONSTANTS.FALSE_RESULT, message: `Question with id ${questionId} not found.` };
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * FROM questions';
+    
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        LOG.error(`Failed to retrieve questions: ${err.message}`);
+        resolve({ data: CONSTANTS.FALSE_RESULT, message: 'Failed to retrieve questions' });
+      } else {
+        LOG.info(`Questions retrieved: ${JSON.stringify(rows)}`);
+        resolve({ data: CONSTANTS.TRUE_RESULT, questions: rows });
       }
-
-      // Assign the question to the quiz (mock operation)
-      question.quizId = quizId;
-
-      LOG.info(`Question ${questionId} assigned to quiz ${quizId}`);
-      return { data: CONSTANTS.TRUE_RESULT, question };
-  }
-};/*const express = require('express');
-const router = express.Router();
-const db = require('../db/db_connection');
-
-// Placeholder code for assigning questions
-router.post('/assignQuestion', (req, res) => {
-  // Logic for assigning questions to users
-  res.status(200).json({ message: 'Questions assigned successfully' });
-});
-
-module.exports = router;
-*/
+    });
+  });
+};
