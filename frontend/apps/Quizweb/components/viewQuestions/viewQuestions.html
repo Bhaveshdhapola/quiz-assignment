@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Questions</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-top: 20px;
+    }
+
+    #questionsContainer {
+      max-width: 800px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .question {
+      margin-bottom: 20px;
+    }
+
+    .question p {
+      margin: 0;
+    }
+
+    .question ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .question ul li {
+      margin-bottom: 5px;
+    }
+
+    .question button {
+      background-color: #dc3545;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .question button:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <h1>View Questions</h1>
+  <div id="questionsContainer"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const questionsContainer = document.getElementById('questionsContainer');
+
+      
+      function displayQuestions(questions) {
+        questionsContainer.innerHTML = '';
+        if (questions.length === 0) {
+          questionsContainer.innerHTML = '<p>No questions available.</p>';
+          return;
+        }
+        questions.forEach((question, index) => {
+          const questionElement = document.createElement('div');
+          questionElement.classList.add('question');
+          questionElement.innerHTML = `
+            <p><strong>Quiz ID:</strong> ${question.quizId}</p>
+            <p><strong>Question:</strong> ${question.questionText}</p>
+            <ul>
+              ${question.options.map(option => `<li>${option}</li>`).join('')}
+            </ul>
+            <p><strong>Correct Answer:</strong> ${question.correctAnswer}</p>
+            <button class="deleteButton" data-index="${index}">Delete</button>
+          `;
+          questionsContainer.appendChild(questionElement);
+        });
+
+        
+        document.querySelectorAll('.deleteButton').forEach(button => {
+          button.addEventListener('click', (event) => {
+            const index = parseInt(event.target.getAttribute('data-index'), 10);
+            deleteQuestion(index);
+          });
+        });
+      }
+
+      
+      function deleteQuestion(index) {
+        const questions = JSON.parse(localStorage.getItem('questions')) || [];
+        questions.splice(index, 1);
+        localStorage.setItem('questions', JSON.stringify(questions));
+        displayQuestions(questions);
+      }
+
+    
+      function loadQuestions() {
+        const questions = JSON.parse(localStorage.getItem('questions')) || [];
+        displayQuestions(questions);
+      }
+
+      loadQuestions();
+    });
+  </script>
+</body>
+</html>
+

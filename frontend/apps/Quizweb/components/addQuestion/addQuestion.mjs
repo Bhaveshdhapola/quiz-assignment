@@ -1,32 +1,40 @@
-document.getElementById('addQuestionForm').addEventListener('submit', async (event) => {
-  event.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('addQuestionForm');
+  const successMessage = document.getElementById('successMessage');
 
-  const question = {
-    question_text: document.getElementById('questionText').value,
-    option1: document.getElementById('option1').value,
-    option2: document.getElementById('option2').value,
-    option3: document.getElementById('option3').value,
-    option4: document.getElementById('option4').value,
-    correct_answer: document.getElementById('correctAnswer').value
-  };
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
 
-  try {
-    const response = await fetch('http://localhost:9090/apps/Quizweb/api/addQuestion', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(question)
-    });
-    const result = await response.json();
-    if (response.ok) {
-      alert(result.message);
-      document.getElementById('addQuestionForm').reset();
-    } else {
-      alert('Failed to add question: ' + result.error);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Failed to add question');
-  }
+    const questionText = document.getElementById('questionText').value;
+    const options = document.getElementById('options').value.split(',').map(option => option.trim());
+    const correctAnswer = document.getElementById('correctAnswer').value;
+
+  
+    const lastQuizId = parseInt(localStorage.getItem('lastQuizId'), 10) || 0;
+    const newQuizId = lastQuizId + 1;
+
+    
+    const questions = JSON.parse(localStorage.getItem('questions')) || [];
+    const newQuestion = {
+      quizId: newQuizId,
+      questionText,
+      options,
+      correctAnswer
+    };
+    questions.push(newQuestion);
+    localStorage.setItem('questions', JSON.stringify(questions));
+
+    
+    localStorage.setItem('lastQuizId', newQuizId);
+
+    
+    form.reset();
+
+    
+    successMessage.style.display = 'block';
+    
+    setTimeout(() => {
+      successMessage.style.display = 'none';
+    }, 3000);
+  });
 });

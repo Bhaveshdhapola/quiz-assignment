@@ -11,12 +11,12 @@
       margin: 0;
       padding: 0;
     }
-    
+
     h1 {
       text-align: center;
       color: #9c77cc;
     }
-    
+
     nav {
       background-color: #e0bde7;
       color: white;
@@ -25,17 +25,17 @@
       margin: 15px;
       border-radius: 1rem;
     }
-    
+
     nav ul {
       list-style-type: none;
       padding: 0;
     }
-    
+
     nav ul li {
       display: inline;
       margin: 0 10px;
     }
-    
+
     nav ul li a {
       color: white;
       text-decoration: none;
@@ -43,9 +43,73 @@
       border-radius: 5px;
       transition: background-color 0.3s;
     }
-    
+
     nav ul li a:hover {
       background-color: #9ab5d3;
+    }
+
+    .quiz-container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .quiz {
+      margin-bottom: 20px;
+    }
+
+    .quiz p {
+      margin: 0 0 10px;
+    }
+
+    .quiz ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .quiz li {
+      margin-bottom: 5px;
+    }
+
+    .quiz button {
+      background-color: #007bff;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .quiz button:hover {
+      background-color: #0056b3;
+    }
+
+    .total-score {
+      margin: 20px 0;
+      font-size: 18px;
+      text-align: center;
+      color: #333;
+    }
+
+    .submit-all {
+      text-align: center;
+    }
+
+    .submit-all button {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .submit-all button:hover {
+      background-color: #218838;
     }
   </style>
 </head>
@@ -53,10 +117,77 @@
   <h1>User Dashboard</h1>
   <nav>
     <ul>
-      <li><a href="viewQuizzes.html">View Quizzes</a></li>
-      <li><a href="takeQuiz.html">Take Quizzes</a></li>
+      <li><a href="components/assignQuiz/assignQuiz.html">View Quizz</a></li>
     </ul>
   </nav>
+  <div class="quiz-container" id="quizContainer"></div>
+  <div class="submit-all">
+    <button id="submitAll">Submit All</button>
+  </div>
+  <div class="total-score" id="totalScore">Total Score: 0</div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const quizContainer = document.getElementById('quizContainer');
+      const totalScoreElement = document.getElementById('totalScore');
+      const submitAllButton = document.getElementById('submitAll');
+      const userEmail = 'user@tech.com'; // Replace with the actual logged-in user's email
+      let totalScore = 0;
 
+      function displayAssignedQuizzes(assignedQuizzes, questions) {
+        quizContainer.innerHTML = '';
+        const userQuizzes = assignedQuizzes.filter(assignment => assignment.userEmail === userEmail);
+
+        if (userQuizzes.length === 0) {
+          quizContainer.innerHTML = '<p>No quizzes assigned.</p>';
+          return;
+        }
+
+        userQuizzes.forEach(assignment => {
+          const quizQuestions = questions.filter(question => question.quizId == assignment.quizId);
+          quizQuestions.forEach(question => {
+            const quizElement = document.createElement('div');
+            quizElement.classList.add('quiz');
+            quizElement.innerHTML = `
+              <p><strong>Quiz ID:</strong> ${assignment.quizId}</p>
+              <p><strong>Question:</strong> ${question.questionText}</p>
+              <ul>
+                ${question.options.map((option, index) => `<li><input type="radio" name="question${question.quizId}" value="${option}" id="option${index}${question.quizId}"> <label for="option${index}${question.quizId}">${option}</label></li>`).join('')}
+              </ul>
+            `;
+            quizContainer.appendChild(quizElement);
+          });
+        });
+      }
+
+      function calculateTotalScore(assignedQuizzes, questions) {
+        totalScore = 0;
+        const userQuizzes = assignedQuizzes.filter(assignment => assignment.userEmail === userEmail);
+        userQuizzes.forEach(assignment => {
+          const quizQuestions = questions.filter(question => question.quizId == assignment.quizId);
+          quizQuestions.forEach(question => {
+            const selectedOption = document.querySelector(`input[name="question${question.quizId}"]:checked`);
+            if (selectedOption && selectedOption.value === question.correctAnswer) {
+              totalScore++;
+            }
+          });
+        });
+        totalScoreElement.textContent = `Total Score: ${totalScore}`;
+      }
+
+      submitAllButton.addEventListener('click', () => {
+        const assignedQuizzes = JSON.parse(localStorage.getItem('assignedQuizzes')) || [];
+        const questions = JSON.parse(localStorage.getItem('questions')) || [];
+        calculateTotalScore(assignedQuizzes, questions);
+      });
+
+      function loadQuizzes() {
+        const assignedQuizzes = JSON.parse(localStorage.getItem('assignedQuizzes')) || [];
+        const questions = JSON.parse(localStorage.getItem('questions')) || [];
+        displayAssignedQuizzes(assignedQuizzes, questions);
+      }
+
+      loadQuizzes();
+    });
+  </script>
 </body>
 </html>
