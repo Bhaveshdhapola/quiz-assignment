@@ -1,32 +1,57 @@
 document.getElementById('loginForm').addEventListener('submit', async (event) => {
-  event.preventDefault();
-
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-
-  const response = await fetch('http://localhost:9090/apps/Quizweb/apis/login.js', {
-    method: 'POST',
-    headers: {  
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ email, password })
-  }); 
-
-  if (response.ok) {
-    const data = await response.json();
-    const userRole = data.user.role;
-
-    
-    if (userRole === 'admin') {
-      window.location.href = '../admin.html';
-    } else {
-      window.location.href = '../user.html';
+    event.preventDefault();
+  
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+  
+    try {
+      // Fetch the users.json file
+      const response = await fetch('users.json');
+      if (!response.ok) {
+        throw new Error('Failed to load user data');
+      }
+  
+      const data = await response.json();
+      const users = data.users;
+  
+      
+      const user = users.find(user => user.email === email && user.password === password);
+  
+      if (user) {
+        const userRole = user.role;
+  
+      
+        if (userRole === 'admin') {
+          window.location.href = '../../admin.html';
+        } else if (userRole === 'user') {
+          window.location.href = '../../users.html';
+        } else {
+          alert('Unknown user role.');
+        }
+      } else {
+        alert('Invalid email or password.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred. Please try again.');
     }
-  } else {
-    const errorData = await response.json();
-    alert(errorData.message || 'Login failed. Please check your credentials.');
-  }
-});
+  });
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
